@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facial Expression Recognition</title>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3.5em;
+      margin-bottom: 40px;
+      color: #fff;
+      text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.6);
+      transform: rotateY(10deg);
+      transition: transform 0.3s ease;
+    }
+
+    h1:hover {
+      transform: rotateY(0deg);
+    }
+
+    /* Container for both form and results side by side */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 80px;
+      max-width: 1200px;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Form styles */
+    form {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 450px;
+      width: 100%;
+    }
+
+    input[type="file"] {
+      background: #fff;
+      color: #333;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 1.3em;
+      margin: 15px 0;
+      border: none;
+      cursor: pointer;
+      width: 85%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    button {
+      padding: 15px 35px;
+      border-radius: 12px;
+      background: #2575fc;
+      color: white;
+      font-size: 1.5em;
+      border: none;
+      cursor: pointer;
+      width: 85%;
+      margin-top: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #1a5bb8;
+    }
+
+    /* Emotion display styles */
+    .emotion {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 30px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #expressionsList {
+      list-style-type: none;
+      padding-left: 0;
+      margin-top: 20px;
+      font-size: 1.3em;
+      width: 100%;
+    }
+
+    #expressionsList li {
+      padding: 10px 20px;
+      background: #ffebcd;
+      margin: 8px 0;
+      border-radius: 15px;
+      text-align: left;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      font-weight: bold;
+      color: #2f4f4f;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      max-width: 90%;
+      word-wrap: break-word;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #expressionsList li:hover {
+      transform: translateX(15px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      background: #f0e68c;
+    }
+
+    img {
+      margin-top: 30px;
+      max-width: 85%;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      display: none;
+      transform: scale(1.1);
+    }
+
+    img.show {
+      transform: scale(1);
+      opacity: 1;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Facial Expression Recognition</h1>
+
+  <div class="container">
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" id="fileInput" name="file" accept="image/*">
+      <button type="submit">Upload Image</button>
+    </form>
+
+    <div class="emotion">
+      <p>Expression détectée : <span id="emotion">...</span></p>
+      <ul id="expressionsList"></ul>
+      <img id="resultImage" />
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData();
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('Veuillez sélectionner un fichier d\'image.');
+        return;
+      }
+
+      formData.append('file', file);
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        const expressionsList = document.getElementById('expressionsList');
+        expressionsList.innerHTML = '';
+
+        if (data.expressions) {
+          data.expressions.forEach(expression => {
+            const listItem = document.createElement('li');
+            listItem.textContent = expression;
+            expressionsList.appendChild(listItem);
+          });
+
+          const resultImage = document.getElementById('resultImage');
+          resultImage.classList.remove('show');
+
+          resultImage.src = data.image + "?t=" + new Date().getTime(); 
+          resultImage.onload = function() {
+            resultImage.classList.add('show');
+          };
+        } else {
+          alert('Aucune expression détectée.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error); 
+        alert('Erreur lors du téléchargement de l\'image.');
+      });
+    });
+  </script>
+</body>
+</html>

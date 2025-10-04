@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Facial Expression Recognition</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #333;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2em;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+
+    .video-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px; /* Space between video and image */
+    }
+
+    video, img {
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 45%; /* Adjust the size of both video and image */
+      border: 1px solid #ccc;
+    }
+
+    .emotion {
+      margin-top: 30px;
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #333;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+      color: white;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Facial Expression Recognition</h1>
+  <div class="video-container">
+    <video id="video" autoplay muted playsinline></video>
+    <img id="frame" style="display: none;" alt="Image annotée" />
+  </div>
+  <p class="emotion">Expression détectée : <span id="emotion">...</span></p>
+
+  <button id="start">Commencer</button>
+  <button id="stop">Arrêter</button>
+
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <script>
+    const socket = io.connect('http://localhost:5000');
+    const video = document.getElementById('video');
+    const emotionDisplay = document.getElementById('emotion');
+    const frameDisplay = document.getElementById('frame');
+
+    let capturing = false;
+    const interval = 2000; // Intervalle d'envoi (2 secondes)
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Activer la webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => console.error("Erreur d'accès à la caméra :", err));
+
+    // Capture et envoi de frames
+    function captureAndSendFrame() {
+      if (!capturing) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const frameData = canvas.toDataURL('image/jpeg'); // Encode la frame en base64
+      socket.emit('frame', { frame: frameData });
+    }
+
+    // Gestion des boutons
+    document.getElementById('start').addEventListener('click', () => {
+      capturing = true;
+    });
+
+    document.getElementById('stop').addEventListener('click', () => {
+      capturing = false;
+    });
+
+    // Envoi périodique
+    setInterval(captureAndSendFrame, interval);
+
+    // Réception des résultats
+    socket.on('emotion', data => {
+      emotionDisplay.textContent = data.emotion;
+      if (data.frame) {
+        frameDisplay.style.display = 'block';
+        frameDisplay.src = data.frame;
+      }
+    });
+  </script>
+</body>
+</html>
