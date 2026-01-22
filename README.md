@@ -94,10 +94,7 @@ Reconnaissance-faciale-des-motions/
 git clone https://github.com/Nour-el-houda34/Reconnaissance-faciale-des--motions.git
 cd Reconnaissance-faciale-des--motions
 ```
-###🔹 2. Créer un environnement virtuel
-```bash
-python -m venv venv
-```
+
 ## ▶️ Installation et Exécution
 
 ### 🔹 2. Créer un environnement virtuel
