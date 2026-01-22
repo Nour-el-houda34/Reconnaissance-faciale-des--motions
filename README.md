@@ -91,10 +91,11 @@ Reconnaissance-faciale-des-motions/
 ```bash
 git clone https://github.com/Nour-el-houda34/Reconnaissance-faciale-des--motions.git
 cd Reconnaissance-faciale-des--motions
-
+```
 ###🔹 2. Créer un environnement virtuel
 ```bash
 python -m venv venv
+
 ## ▶️ Installation et Exécution
 
 ### 🔹 2. Créer un environnement virtuel
@@ -115,7 +116,7 @@ python -m venv venv
 
     pip install tensorflow opencv-python flask numpy pandas scikit-learn matplotlib
 
-
+```
 ---
 
 ### 🔹 4. Lancer l’application web
