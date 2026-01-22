@@ -95,38 +95,39 @@ cd Reconnaissance-faciale-des--motions
 ###🔹 2. Créer un environnement virtuel
 ```bash
 python -m venv venv
-
+```
 ## ▶️ Installation et Exécution
 
 ### 🔹 2. Créer un environnement virtuel
-
+```bash
     python -m venv venv
-
+```
 #### Sous Windows
-
+```bash
     venv\Scripts\activate
-
+```
 #### Sous Linux / macOS
-
+```bash
     source venv/bin/activate
-
+```
 ---
 
 ### 🔹 3. Installer les dépendances
-
+```bash
     pip install tensorflow opencv-python flask numpy pandas scikit-learn matplotlib
 
 ```
 ---
 
 ### 🔹 4. Lancer l’application web
-
+```bash
     python app.py
-
+```
 Ouvrir le navigateur à l’adresse :
 
-    http://localhost:5000
-
+ ```bash
+   http://localhost:5000
+```
 ---
 
 ## 🌐 Fonctionnalités de l’Application
