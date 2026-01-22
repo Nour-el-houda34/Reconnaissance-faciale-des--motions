@@ -32,6 +32,7 @@ Les émotions reconnues sont :
 ---
 
 ## 📂 Contenu du Projet
+```text
 
 Reconnaissance-faciale-des-motions/
 │
@@ -69,7 +70,8 @@ Reconnaissance-faciale-des-motions/
 │   # Fichiers de configuration de l’IDE 
 │
 └── README.md
-   
+  ```
+ 
 
 ---
 ## 🛠️ Technologies Utilisées
